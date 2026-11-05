@@ -42,10 +42,4 @@ Without `pip install` prefix everything with `python3 -m cmb`.
 
 Exit codes: `0` done, `2` not logged in, `3` a quiz failed (unknown type dumps the quiz JSON + a screenshot to a debug folder and prints the path).
 
-## Tests
-
-```bash
-python3 -m pytest -q
-```
-
 This is for educational purposes only blah blah...
