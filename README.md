@@ -19,13 +19,13 @@ Everything runs on your machine; nothing leaves it except requests to thechairma
 ### Install
 
 ```bash
-pipx install git+https://github.com/iwdissi-rl/paobao.git   # or: pip install git+…
+pipx install git+https://github.com/iwdissi-rl/CMB_Cheat.git   # or: pip install git+…
 ```
 
 No `pipx`? Clone and run — there is nothing to install at all:
 
 ```bash
-git clone https://github.com/iwdissi-rl/paobao.git && cd paobao
+git clone https://github.com/iwdissi-rl/CMB_Cheat.git && cd CMB_Cheat
 python3 -m paobao status
 ```
 
