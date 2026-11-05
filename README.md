@@ -48,4 +48,4 @@ Exit codes: `0` done, `2` not logged in, `3` a quiz failed (unknown type dumps t
 python3 -m pytest -q
 ```
 
-No network: the vendored LZ4 decoder (Firefox's sessionstore format), the vendored AES decryptor (Chromium's cookie format), link parsing, pacing, login detection across browser families, and the CLI end-to-end with the browser mocked.
+This is for educational purposes only blah blah...
