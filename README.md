@@ -1,4 +1,4 @@
-# paobao
+# Auto_CMB
 
 A small terminal runner for [The Chairman's Bao](https://www.thechairmansbao.com): it finds your logged-in Firefox session, you paste in passage links, and it completes the reading quizzes for you — one per passage, each after a random "reading time" you choose.
 
