@@ -41,4 +41,4 @@ Chromium-family cookies). Keep it that way.
 
 `/usr/bin/python3 -m pytest -q` → 48 passed. `tests/test_cdp.py` has a live-CDP smoke test that
 launches real headless Chromium (skips cleanly if no binary). Do not mock away `solve()` — the
-hash-matching logic is the point (see `tests/test_paobao.py::test_solve_*`).
+hash-matching logic is the point (see `tests/test_cmb.py::test_solve_*`).
