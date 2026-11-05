@@ -33,10 +33,10 @@ def run_cli(argv, pending=PENDING, scores=None):
         calls["quiz"].append((pid, aid))
         return scores or {"_comprahension_CTS": 100}
 
-    with mock.patch.object(cli, "site_cookies", return_value=[]), \
+    with mock.patch("paobao.browsers.detect", return_value=("firefox", [])), \
          mock.patch.object(Tcb, "logged_in", property(lambda self: True)), \
          mock.patch.object(Tcb, "pending", return_value=pending), \
-         mock.patch("paobao.cli.make_runner", return_value=MagicMock()), \
+         mock.patch("paobao.browsers.make_runner", return_value=MagicMock()), \
          mock.patch("paobao.cli.run_quiz", side_effect=fake_run_quiz), \
          mock.patch("paobao.cli.time.sleep"):
         buf = io.StringIO()
@@ -78,10 +78,10 @@ def test_run_pacing_range_is_respected(tmp_path, monkeypatch):
     def fake_run_quiz(w, site, pid, aid, debug_dir, sleep=lambda s: None):
         return {}
 
-    with mock.patch.object(cli, "site_cookies", return_value=[]), \
+    with mock.patch("paobao.browsers.detect", return_value=("firefox", [])), \
          mock.patch.object(Tcb, "logged_in", property(lambda self: True)), \
          mock.patch.object(Tcb, "pending", return_value=PENDING), \
-         mock.patch("paobao.cli.make_runner", return_value=MagicMock()), \
+         mock.patch("paobao.browsers.make_runner", return_value=MagicMock()), \
          mock.patch("paobao.cli.run_quiz", side_effect=fake_run_quiz), \
          mock.patch("paobao.cli.time.sleep", side_effect=slept.append):
         buf = io.StringIO()

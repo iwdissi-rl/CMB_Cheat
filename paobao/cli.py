@@ -17,22 +17,27 @@ import os
 import sys
 import time
 
-from . import __version__
+from . import __version__, browsers
 from .api import SITE, Tcb, essay_markdown
-from .driver import Unknown, default_firefox_binary, make_runner, new_debug_dir, run_quiz
-from .firefox import site_cookies
+from .driver import Unknown, new_debug_dir, run_quiz
 from .links import index_pending, parse_links, resolve
 from .pacing import parse_range, roll_seconds
 
 ESSAYS_DIR = os.path.expanduser("~/tcb_essays")
 
 
-def _cookies(args) -> list:
-    return site_cookies(args.profile)
+def _select(args) -> tuple[str, list]:
+    """Resolve (browser name, cookies): explicit --browser, else auto-detect."""
+    if getattr(args, "browser", None):
+        return args.browser, browsers.cookies_for(args.browser, args.profile)
+    name, cks = browsers.detect()
+    if name:
+        return name, cks
+    return "firefox", browsers.cookies_for("firefox", args.profile)
 
 
 def _tcb(args) -> Tcb:
-    return Tcb(_cookies(args))
+    return Tcb(_select(args)[1])
 
 
 def _read_links(args) -> list[str]:
@@ -64,15 +69,17 @@ def _save_essays(data: list[dict]) -> list[str]:
 
 
 def cmd_status(args) -> int:
-    t = _tcb(args)
+    name, cks = _select(args)
+    t = Tcb(cks)
     if not t.logged_in:
-        print("NOT LOGGED IN: open thechairmansbao.com in Firefox, log in, then retry.")
+        print("NOT LOGGED IN: open thechairmansbao.com in Firefox/Chrome/Brave/Edge, "
+              "log in, then retry (or point --profile at the profile dir).")
         return 2
     data = t.pending()
     if data is None:
         print("NOT LOGGED IN (or site unreachable): retry, or check the network.")
         return 2
-    print(f"Logged in to {SITE} — {len(data)} outstanding assignment(s):")
+    print(f"Logged in to {SITE} via {name} — {len(data)} outstanding assignment(s):")
     for a in data:
         A = a["assignment"]
         tag = "READING" if A["type"] == 1 else f"skip ({A['type_text']})"
@@ -97,9 +104,11 @@ def cmd_run(args) -> int:
         print("No links given.")
         return 0
     lo, hi = args.range
-    t = _tcb(args)
+    name, cks = _select(args)
+    t = Tcb(cks)
     if not t.logged_in:
-        print("NOT LOGGED IN: open thechairmansbao.com in Firefox, log in, then retry.")
+        print("NOT LOGGED IN: open thechairmansbao.com in Firefox/Chrome/Brave/Edge, "
+              "log in, then retry.")
         return 2
     pend = t.pending() or []
     idx = index_pending(pend)
@@ -115,7 +124,7 @@ def cmd_run(args) -> int:
         return 0
 
     debug_dir = new_debug_dir()
-    runner = make_runner(_cookies(args), binary=default_firefox_binary())
+    runner = browsers.make_runner(name, cks)
     failed: list[str] = []
     try:
         for it, secs in zip(items, plan):
@@ -151,20 +160,25 @@ def cmd_run(args) -> int:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="bao", description="The Chairman's Bao reading-assignment runner.")
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    p.add_argument("--profile", help="path to a Firefox profile dir (default: newest with a sessionstore)")
+    p.add_argument("--profile", help="path to a browser profile dir (default: auto-detect)")
     sub = p.add_subparsers(dest="command")
+    brows = dict(type=str.lower, choices=sorted(browsers._FAMILIES),
+                 help="browser to read the login from (default: auto-detect)")
 
     sp = sub.add_parser("status", help="detect login and list pending assignments")
     sp.add_argument("--profile")
+    sp.add_argument("--browser", **brows)
     sp.set_defaults(func=cmd_status, links=[], range=(4.0, 9.0), dry_run=False, now=False)
 
     ss = sub.add_parser("save", help="save all pending essays to ~/tcb_essays")
     ss.add_argument("--profile")
+    ss.add_argument("--browser", **brows)
     ss.set_defaults(func=cmd_save, links=[], range=(4.0, 9.0), dry_run=False, now=False)
 
     rp = sub.add_parser("run", help="complete the given passages, paced")
     rp.add_argument("links", nargs="*", help="Chairman's Bao passage URLs")
     rp.add_argument("--profile")
+    rp.add_argument("--browser", **brows)
     rp.add_argument("-r", "--range", type=parse_range, default=(4.0, 9.0), metavar="MIN[-MAX]",
                     help="reading time per passage in minutes (default 4-9)")
     rp.add_argument("-n", "--dry-run", action="store_true", help="show the plan, touch no browser")

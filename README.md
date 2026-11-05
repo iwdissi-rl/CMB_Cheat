@@ -1,50 +1,58 @@
 # Auto_CMB
 
-A small terminal runner for [The Chairman's Bao](https://www.thechairmansbao.com): it finds your logged-in Firefox session, you paste in passage links, and it completes the reading quizzes for you — one per passage, each after a random "reading time" you choose.
+A terminal runner for [The Chairman's Bao](https://www.thechairmansbao.com): it borrows your browser login, you paste passage links, and it completes the reading quizzes — one per passage, each after a random "reading time" you set.
 
 ## What it does
 
 You run `bao` and it:
 
-1. **Detects your login.** It reads the Chairman's Bao cookies straight out of your running Firefox profile (no API key, no password entry). If the session expired, it tells you to log in and stops.
-2. **Takes your links.** Paste Chairman's Bao article links at the prompt, or hand them on the command line. Links that match a pending assignment get the right article and assignment ids automatically.
-3. **Reads at a human pace.** Before each quiz it waits a random number of seconds drawn from the window you set (`-r 4-9` means each passage waits between 4 and 9 minutes), so submissions are spread out instead of instant.
-4. **Answers with the real key.** The site stores the quiz answers md5-hashed inside its Vue app. The runner opens each quiz in a separate headless Firefox, matches the hashes to the visible options, fills them in, and presses the app's own *next* button — so the site scores and submits normally. Listening assignments are left for you.
-5. **Saves the essays.** Every pending passage is also written as Markdown to `~/tcb_essays/<slug>.md` (title, HSK level, due date, text, proper nouns, keywords).
+1. **Detects your login.** Reads the Chairman's Bao cookies straight from your browser profile — **Firefox, Chrome, Chromium, Brave or Edge** (no API key, no password entry). If the session expired, it says so and stops.
+2. **Takes your links.** Paste article links at the prompt or hand them on the command line; links matching a pending assignment resolve automatically.
+3. **Reads at a human pace.** Before each quiz it waits a random time from your window (`-r 4-9` = between 4 and 9 minutes per passage), so submissions spread out instead of firing instantly.
+4. **Answers with the real key.** The site stores quiz answers as md5 hashes inside its Vue app. Each quiz opens in a separate headless browser (WebDriver for Firefox, DevTools Protocol for Chromium — nothing to install beyond the browser itself), the hashes are matched to the visible options, and the app's own *next* button is pressed, so the site scores normally. Listening assignments are left for you.
+5. **Saves the essays.** Pending passages are written as Markdown to `~/tcb_essays/<slug>.md`.
 
-Everything runs on your own machine; nothing is sent anywhere except the Chairman's Bao site itself.
+Everything runs on your machine; nothing leaves it except requests to thechairmansbao.com.
 
 ## Getting started
 
-### 1. What you need
+### Install
 
-- **Python 3.10 or newer** (stdlib only — no third-party packages)
-- **Firefox** (snap build works out of the box) logged in to thechairmansbao.com
-- **geckodriver** on `PATH` (only when quizzes are actually taken)
+```bash
+pipx install git+https://github.com/iwdissi-rl/paobao.git   # or: pip install git+…
+```
 
-### 2. Run it
+No `pipx`? Clone and run — there is nothing to install at all:
 
 ```bash
 git clone https://github.com/iwdissi-rl/paobao.git && cd paobao
-
-python3 -m paobao status          # am I logged in? what's pending?
-python3 -m paobao save            # save all pending essays to ~/tcb_essays
-python3 -m paobao run URL [URL…]  # complete these passages, paced
-python3 -m paobao                 # bare: paste links at the prompt, one per line
+python3 -m paobao status
 ```
 
-After `pip install .` the same commands are available as `bao`.
+Requirements: **Python 3.10+** (stdlib only) and any one of Firefox / Chrome / Chromium / Brave / Edge, logged in to thechairmansbao.com. Firefox additionally wants `geckodriver` on `PATH` when quizzes are actually taken.
 
-### 3. Useful flags
+### Run it
+
+```bash
+bao status              # am I logged in? what's pending? (tells you which browser it found)
+bao save                # save all pending essays to ~/tcb_essays
+bao run URL [URL…]      # complete these passages, paced
+bao                     # bare: paste links at the prompt, one per line
+```
+
+Without `pip install` prefix everything with `python3 -m paobao`.
+
+### Useful flags
 
 | Flag | Meaning |
 |---|---|
 | `-r 4-9` / `--range 4-9` | reading time per passage, minutes (default `4-9`; `-r 5` = fixed 5) |
 | `-n` / `--dry-run` | show the plan and the rolled times, touch no browser |
 | `--now` | skip the waits, run back to back |
-| `--profile PATH` | pick a Firefox profile instead of the newest one |
+| `--browser NAME` | `firefox`, `chrome`, `chromium`, `brave`, `edge` (default: first browser holding a login) |
+| `--profile PATH` | pick a profile directory instead of the default one |
 
-Exit codes: `0` done, `2` not logged in, `3` a quiz type the solver doesn't know (it dumps the quiz JSON + a screenshot to a debug folder and prints the path).
+Exit codes: `0` done, `2` not logged in, `3` an unknown quiz type (dumps the quiz JSON + a screenshot to a debug folder and prints the path).
 
 ## Tests
 
@@ -52,7 +60,7 @@ Exit codes: `0` done, `2` not logged in, `3` a quiz type the solver doesn't know
 python3 -m pytest -q
 ```
 
-24 tests, no network: the vendored LZ4 decoder (Firefox's sessionstore format), link parsing, the pacing window, login detection, and the CLI end-to-end with the browser mocked.
+No network: the vendored LZ4 decoder (Firefox's sessionstore format), the vendored AES decryptor (Chromium's cookie format), link parsing, pacing, login detection across browser families, and the CLI end-to-end with the browser mocked.
 
 ## How the quiz solving works
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paobao"
-version = "0.1.0"
+version = "0.2.0"
 description = "CLI for The Chairman's Bao: detect your Firefox login, paste passage links, auto-complete the reading quizzes with a random reading time between each."
 requires-python = ">=3.10"
 license = { text = "MIT" }
