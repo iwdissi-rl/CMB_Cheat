@@ -52,7 +52,7 @@ Without `pip install` prefix everything with `python3 -m paobao`.
 | `--browser NAME` | `firefox`, `chrome`, `chromium`, `brave`, `edge` (default: first browser holding a login) |
 | `--profile PATH` | pick a profile directory instead of the default one |
 
-Exit codes: `0` done, `2` not logged in, `3` an unknown quiz type (dumps the quiz JSON + a screenshot to a debug folder and prints the path).
+Exit codes: `0` done, `2` not logged in, `3` a quiz failed (unknown type dumps the quiz JSON + a screenshot to a debug folder and prints the path).
 
 ## Tests
 

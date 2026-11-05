@@ -162,22 +162,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     p.add_argument("--profile", help="path to a browser profile dir (default: auto-detect)")
     sub = p.add_subparsers(dest="command")
-    brows = dict(type=str.lower, choices=sorted(browsers._FAMILIES),
+    brows = dict(type=str.lower, choices=sorted(browsers._FAMILIES), default=argparse.SUPPRESS,
                  help="browser to read the login from (default: auto-detect)")
 
     sp = sub.add_parser("status", help="detect login and list pending assignments")
-    sp.add_argument("--profile")
+    sp.add_argument("--profile", default=argparse.SUPPRESS)
     sp.add_argument("--browser", **brows)
     sp.set_defaults(func=cmd_status, links=[], range=(4.0, 9.0), dry_run=False, now=False)
 
     ss = sub.add_parser("save", help="save all pending essays to ~/tcb_essays")
-    ss.add_argument("--profile")
+    ss.add_argument("--profile", default=argparse.SUPPRESS)
     ss.add_argument("--browser", **brows)
     ss.set_defaults(func=cmd_save, links=[], range=(4.0, 9.0), dry_run=False, now=False)
 
     rp = sub.add_parser("run", help="complete the given passages, paced")
     rp.add_argument("links", nargs="*", help="Chairman's Bao passage URLs")
-    rp.add_argument("--profile")
+    rp.add_argument("--profile", default=argparse.SUPPRESS)
     rp.add_argument("--browser", **brows)
     rp.add_argument("-r", "--range", type=parse_range, default=(4.0, 9.0), metavar="MIN[-MAX]",
                     help="reading time per passage in minutes (default 4-9)")
@@ -190,9 +190,16 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     parser = build_parser()
+    cmds = ("status", "save", "run")
     if not argv:
         argv = ["run"]
-    elif argv[0] not in ("status", "save", "run", "-h", "--help", "--version"):
-        argv = ["run", *argv]  # bare `bao https://…` == `bao run https://…`
+    elif argv[0] in cmds or argv[0] in ("-h", "--help", "--version"):
+        pass
+    elif any(a in cmds for a in argv):
+        # flags before the subcommand: `bao --browser chrome status` -> `bao status --browser chrome`
+        i = next(i for i, a in enumerate(argv) if a in cmds)
+        argv = [argv[i], *[a for j, a in enumerate(argv) if j != i]]
+    else:
+        argv = ["run", *argv]  # bare `bao https://…` (or `bao --now https://…`) -> run
     args = parser.parse_args(argv)
     return args.func(args)

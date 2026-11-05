@@ -97,6 +97,21 @@ def test_run_unrecognised_link_is_skipped():
     assert "SKIP" in out and calls["quiz"] == []
 
 
+def test_flags_before_subcommand_are_applied():
+    # `bao --browser chrome status` must parse as `status --browser chrome`,
+    # not as `run` with the flags treated as links
+    code, out, calls = run_cli(["--browser", "chrome", "status"])
+    assert code == 0
+    assert calls["quiz"] == []
+    assert "via chrome" in out
+
+
+def test_dash_flags_before_a_link_go_to_run():
+    code, out, calls = run_cli(["--now", LINK])
+    assert code == 0
+    assert len(calls["quiz"]) == 1
+
+
 def test_save_writes_essays(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "ESSAYS_DIR", str(tmp_path))
     code, out, _ = run_cli(["save"])

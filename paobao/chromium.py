@@ -27,6 +27,7 @@ import json
 import os
 import shutil
 import sqlite3
+import sys
 import tempfile
 
 from .firefox import SITE_HOST, Cookie
@@ -281,8 +282,14 @@ def site_cookies(profile: str, host: str = SITE_HOST,
     keys.append(_pbkdf2(_FALLBACK_PASSPHRASE))
 
     out: list[Cookie] = []
+    undecryptable = 0
     for host_key, name, value, path, is_secure, enc in rows:
         if not value and enc and bytes(enc[:3]) in _PREFIXES:
             value = _decrypt_value(bytes(enc), keys)
+            if not value:
+                undecryptable += 1
         out.append(Cookie(name, value or "", host_key, path or "/", bool(is_secure)))
+    if undecryptable and undecryptable == sum(1 for c in out if not c.value):
+        print(f"paobao: {undecryptable} encrypted cookie(s) could not be decrypted — "
+              "is the browser password vault unlocked? (keyring/keystore)", file=sys.stderr)
     return out
