@@ -4,7 +4,7 @@ A terminal runner for [The Chairman's Bao](https://www.thechairmansbao.com): it 
 
 ## What it does
 
-You run `bao` and it:
+You run `cmb` and it:
 
 1. **Detects your login.** Reads the Chairman's Bao cookies straight from your browser profile — **Firefox, Chrome, Chromium, Brave or Edge** (no API key, no password entry). If the session expired, it says so and stops.
 2. **Takes your links.** Paste article links at the prompt or hand them on the command line; links matching a pending assignment resolve automatically.
@@ -26,7 +26,7 @@ No `pipx`? Clone and run — there is nothing to install at all:
 
 ```bash
 git clone https://github.com/iwdissi-rl/CMB_Cheat.git && cd CMB_Cheat
-python3 -m paobao status
+python3 -m cmb status
 ```
 
 Requirements: **Python 3.10+** (stdlib only) and any one of Firefox / Chrome / Chromium / Brave / Edge, logged in to thechairmansbao.com. Firefox additionally wants `geckodriver` on `PATH` when quizzes are actually taken.
@@ -34,13 +34,13 @@ Requirements: **Python 3.10+** (stdlib only) and any one of Firefox / Chrome / C
 ### Run it
 
 ```bash
-bao status              # am I logged in? what's pending? (tells you which browser it found)
-bao save                # save all pending essays to ~/tcb_essays
-bao run URL [URL…]      # complete these passages, paced
-bao                     # bare: paste links at the prompt, one per line
+cmb status              # am I logged in? what's pending? (tells you which browser it found)
+cmb save                # save all pending essays to ~/tcb_essays
+cmb run URL [URL…]      # complete these passages, paced
+cmb                     # bare: paste links at the prompt, one per line
 ```
 
-Without `pip install` prefix everything with `python3 -m paobao`.
+Without `pip install` prefix everything with `python3 -m cmb`.
 
 ### Useful flags
 

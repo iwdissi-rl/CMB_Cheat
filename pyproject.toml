@@ -3,15 +3,15 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "paobao"
-version = "0.2.0"
+name = "cmb"
+version = "0.3.0"
 description = "CLI for The Chairman's Bao: borrow your browser login (Firefox, Chrome, Chromium, Brave, Edge), paste passage links, auto-complete the reading quizzes with a random reading time between each."
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "iwdissi-rl" }]
 
 [project.scripts]
-bao = "paobao.cli:main"
+cmb = "cmb.cli:main"
 
 [tool.setuptools]
-packages = ["paobao"]
+packages = ["cmb"]

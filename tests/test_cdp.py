@@ -5,9 +5,9 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from paobao.cdp import CdpRunner, chromium_binary
-from paobao.driver import WALK_JS
-from paobao.firefox import Cookie
+from cmb.cdp import CdpRunner, chromium_binary
+from cmb.driver import WALK_JS
+from cmb.firefox import Cookie
 
 CHROME = chromium_binary()
 needs_chrome = pytest.mark.skipif(CHROME is None, reason="no chromium binary on this box")
@@ -20,11 +20,11 @@ DATA_URL = ("data:text/html,<html><head><title>cdp-test-page</title></head>"
 
 def test_module_imports_do_not_cycle():
     """driver must not import cdp; cdp imports WALK_JS from driver."""
-    import paobao.driver as driver
+    import cmb.driver as driver
     assert "cdp" not in sys.modules or not hasattr(driver, "cdp")
     src = open(driver.__file__).read()
     assert "import cdp" not in src.replace("CdpRunner", "")
-    from paobao import cdp
+    from cmb import cdp
     assert cdp.WALK_JS is driver.WALK_JS
 
 
@@ -35,7 +35,7 @@ def test_chromium_binary_returns_executable_or_none():
 
 
 def test_constructor_without_binary_fails_fast(monkeypatch):
-    monkeypatch.setattr("paobao.cdp.chromium_binary", lambda: None)
+    monkeypatch.setattr("cmb.cdp.chromium_binary", lambda: None)
     with pytest.raises(RuntimeError, match="[Nn]o Chromium"):
         CdpRunner()
 

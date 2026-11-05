@@ -1,9 +1,9 @@
-"""Command-line interface for paobao.
+"""Command-line interface for cmb.
 
-    bao status                      detect the Firefox login, list pending
-    bao                             paste links at the prompt, run them paced
-    bao run URL [URL...]            run specific passages
-    bao save                        save all pending essays to ~/tcb_essays
+    cmb status                      detect the Firefox login, list pending
+    cmb                             paste links at the prompt, run them paced
+    cmb run URL [URL...]            run specific passages
+    cmb save                        save all pending essays to ~/tcb_essays
 
 Pacing: each passage waits a random whole-second time drawn uniformly from
 [--min, --max] minutes before its quiz is taken — the "reading time" the user
@@ -158,7 +158,7 @@ def cmd_run(args) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="bao", description="The Chairman's Bao reading-assignment runner.")
+    p = argparse.ArgumentParser(prog="cmb", description="The Chairman's Bao reading-assignment runner.")
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     p.add_argument("--profile", help="path to a browser profile dir (default: auto-detect)")
     sub = p.add_subparsers(dest="command")
@@ -196,10 +196,10 @@ def main(argv: list[str] | None = None) -> int:
     elif argv[0] in cmds or argv[0] in ("-h", "--help", "--version"):
         pass
     elif any(a in cmds for a in argv):
-        # flags before the subcommand: `bao --browser chrome status` -> `bao status --browser chrome`
+        # flags before the subcommand: `cmb --browser chrome status` -> `cmb status --browser chrome`
         i = next(i for i, a in enumerate(argv) if a in cmds)
         argv = [argv[i], *[a for j, a in enumerate(argv) if j != i]]
     else:
-        argv = ["run", *argv]  # bare `bao https://…` (or `bao --now https://…`) -> run
+        argv = ["run", *argv]  # bare `cmb https://…` (or `cmb --now https://…`) -> run
     args = parser.parse_args(argv)
     return args.func(args)

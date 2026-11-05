@@ -6,10 +6,10 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from paobao.api import Tcb, essay_markdown
-from paobao.firefox import Cookie, lz4_block_decompress
-from paobao.links import index_pending, link_to_slug, parse_links, resolve
-from paobao.pacing import parse_range, roll_seconds
+from cmb.api import Tcb, essay_markdown
+from cmb.firefox import Cookie, lz4_block_decompress
+from cmb.links import index_pending, link_to_slug, parse_links, resolve
+from cmb.pacing import parse_range, roll_seconds
 
 
 # ---------- vendored lz4 ----------

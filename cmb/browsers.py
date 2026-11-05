@@ -1,4 +1,4 @@
-"""Browser registry: which browsers paobao knows, where their profiles live.
+"""Browser registry: which browsers cmb knows, where their profiles live.
 
 Two families share everything between them:
 

@@ -290,6 +290,6 @@ def site_cookies(profile: str, host: str = SITE_HOST,
                 undecryptable += 1
         out.append(Cookie(name, value or "", host_key, path or "/", bool(is_secure)))
     if undecryptable and undecryptable == sum(1 for c in out if not c.value):
-        print(f"paobao: {undecryptable} encrypted cookie(s) could not be decrypted — "
+        print(f"cmb: {undecryptable} encrypted cookie(s) could not be decrypted — "
               "is the browser password vault unlocked? (keyring/keystore)", file=sys.stderr)
     return out

@@ -10,9 +10,9 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from paobao.chromium import (_unpad, aes256_cbc_decrypt, default_profile,
+from cmb.chromium import (_unpad, aes256_cbc_decrypt, default_profile,
                              find_config_root, site_cookies)
-from paobao.firefox import Cookie
+from cmb.firefox import Cookie
 
 
 # ---------- vendored AES-256-CBC: known-answer vectors ----------
@@ -48,7 +48,7 @@ def test_aes256_cbc_rejects_bad_length():
 
 
 def test_unpad_leaves_non_pkcs7_alone():
-    from paobao.chromium import _unpad
+    from cmb.chromium import _unpad
     assert _unpad(b"abc\x05\x05\x05\x05\x05") == b"abc"
     assert _unpad(b"abc") == b"abc"          # last byte 0x63: not valid pad
     assert _unpad(b"cookie\x00\x00") == b"cookie"  # Chromium NULs

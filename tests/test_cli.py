@@ -9,8 +9,8 @@ from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from paobao import cli
-from paobao.api import Tcb
+from cmb import cli
+from cmb.api import Tcb
 
 PENDING = [
     {
@@ -33,12 +33,12 @@ def run_cli(argv, pending=PENDING, scores=None):
         calls["quiz"].append((pid, aid))
         return scores or {"_comprahension_CTS": 100}
 
-    with mock.patch("paobao.browsers.detect", return_value=("firefox", [])), \
+    with mock.patch("cmb.browsers.detect", return_value=("firefox", [])), \
          mock.patch.object(Tcb, "logged_in", property(lambda self: True)), \
          mock.patch.object(Tcb, "pending", return_value=pending), \
-         mock.patch("paobao.browsers.make_runner", return_value=MagicMock()), \
-         mock.patch("paobao.cli.run_quiz", side_effect=fake_run_quiz), \
-         mock.patch("paobao.cli.time.sleep"):
+         mock.patch("cmb.browsers.make_runner", return_value=MagicMock()), \
+         mock.patch("cmb.cli.run_quiz", side_effect=fake_run_quiz), \
+         mock.patch("cmb.cli.time.sleep"):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             code = cli.main(argv)
@@ -78,12 +78,12 @@ def test_run_pacing_range_is_respected(tmp_path, monkeypatch):
     def fake_run_quiz(w, site, pid, aid, debug_dir, sleep=lambda s: None):
         return {}
 
-    with mock.patch("paobao.browsers.detect", return_value=("firefox", [])), \
+    with mock.patch("cmb.browsers.detect", return_value=("firefox", [])), \
          mock.patch.object(Tcb, "logged_in", property(lambda self: True)), \
          mock.patch.object(Tcb, "pending", return_value=PENDING), \
-         mock.patch("paobao.browsers.make_runner", return_value=MagicMock()), \
-         mock.patch("paobao.cli.run_quiz", side_effect=fake_run_quiz), \
-         mock.patch("paobao.cli.time.sleep", side_effect=slept.append):
+         mock.patch("cmb.browsers.make_runner", return_value=MagicMock()), \
+         mock.patch("cmb.cli.run_quiz", side_effect=fake_run_quiz), \
+         mock.patch("cmb.cli.time.sleep", side_effect=slept.append):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             code = cli.main(["run", LINK, "-r", "1-2"])
@@ -98,7 +98,7 @@ def test_run_unrecognised_link_is_skipped():
 
 
 def test_flags_before_subcommand_are_applied():
-    # `bao --browser chrome status` must parse as `status --browser chrome`,
+    # `cmb --browser chrome status` must parse as `status --browser chrome`,
     # not as `run` with the flags treated as links
     code, out, calls = run_cli(["--browser", "chrome", "status"])
     assert code == 0

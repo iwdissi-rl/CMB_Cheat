@@ -4,7 +4,7 @@
 set_cookie / shot / close`` surface, so ``driver.run_quiz`` and ``driver.solve``
 drive it unchanged. Instead of geckodriver it launches a Chromium-family
 browser with ``--remote-debugging-port`` and speaks JSON-RPC over the
-browser-level WebSocket from ``paobao.ws`` — stdlib only, no selenium.
+browser-level WebSocket from ``cmb.ws`` — stdlib only, no selenium.
 
 The page domain is reached through a flattened ``Target.attachToTarget``
 session; ``js`` wraps the code in an IIFE with the Python args JSON-inlined so
@@ -52,7 +52,7 @@ def chromium_binary() -> str | None:
 
 
 class CdpRunner:
-    """Minimal CDP client over paobao.ws — duck type of driver.WD."""
+    """Minimal CDP client over cmb.ws — duck type of driver.WD."""
 
     def __init__(self, cookies=(), binary: str | None = None,
                  port: int | None = None, headless: bool = True):
